@@ -5,12 +5,10 @@
    
 (defun one () 1) 
 
-(funcall (observable 
- (function one)) 
-  (function write))
+(funcall (observable #'one) #'write) 
 
 
-(defun dbl (x) (+ x 2))
+(defun dbl (x) (* x 2))
  
 (defun fmap (obs fn)
 	(observable 
@@ -18,8 +16,7 @@
 			(funcall obs 
 				(lambda (val) (funcall fn val))))))
   
-(funcall (fmap 
-	(observable 
-		(function one))
-	(function dbl)) 
- (function write)) 
+(funcall 
+		(fmap 
+			(observable #'one) #'dbl) 
+		#'write) 
