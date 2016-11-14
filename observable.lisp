@@ -1,22 +1,26 @@
 (defun observable (executor)
  (lambda (observer) 
-  (funcall observer 
-   (funcall executor))))
+   (funcall executor observer)))
    
-(defun one () 1) 
+(defun ones (next) 
+	(funcall next 1)
+	(funcall next 2)
+	(funcall next 3)) 
 
-(funcall (observable #'one) #'write) 
+(funcall (observable #'ones) #'write) 
 
 
 (defun dbl (x) (* x 2))
  
 (defun fmap (obs fn)
 	(observable 
-		(lambda ()
+		(lambda (next)
 			(funcall obs 
-				(lambda (val) (funcall fn val))))))
+				(lambda (val) 
+					(funcall next
+						(funcall fn val)))))))
   
 (funcall 
 		(fmap 
-			(observable #'one) #'dbl) 
+			(observable #'ones) #'dbl) 
 		#'write) 
