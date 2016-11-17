@@ -1,34 +1,18 @@
-(defun observable (executor)
+(defun create-observable (executor)
  (lambda (observer) 
    (funcall executor observer)))
-   
-(defun ones (next) 
-	(funcall next 1)
-	(funcall next 2)
-	(funcall next 3)
-	(funcall next 4)
-	(funcall next 5)) 
-
-(funcall (observable #'ones) #'write) 
-
-
-(defun dbl (x) (* x 2))
  
 (defun fmap (obs fn)
-	(observable 
+	(create-observable 
 		(lambda (next)
 			(funcall obs 
 				(lambda (val) 
 					(funcall next
 						(funcall fn val)))))))
   
-(funcall 
-		(fmap 
-			(observable #'ones) #'dbl) 
-		#'write) 
 		
 (defun filter (obs pred)
-	(observable 
+	(create-observable 
 		(lambda (next) 
 			(funcall obs
 				(lambda (val)
@@ -38,8 +22,32 @@
 
 (defun even? (val)
 	(eq (rem val 2) 0))
+
+(defun dbl (x) (* x 2))
+
+(defun nat (next) 
+	(funcall next 1)
+	(funcall next 2)
+	(funcall next 3)
+	(funcall next 4)
+	(funcall next 5)) 
 					
+(funcall (create-observable #'nat) #'write) 
+(write-line "")
+(funcall 
+		(fmap 
+			(create-observable #'nat) #'dbl) 
+		#'write) 
+		
+(write-line "")
 (funcall 
 		(filter 
-			(observable #'ones) #'even?) 
+			(create-observable #'nat) #'even?) 
+		#'write) 
+(write-line "")
+(funcall 
+		(fmap
+			(filter 
+				(create-observable #'nat) #'even?)
+			#'dbl)
 		#'write) 
